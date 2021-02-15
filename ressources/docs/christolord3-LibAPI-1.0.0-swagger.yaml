@@ -1,0 +1,106 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: LibAPI - Votre interface entre vous et vos livres !
+  description: Une API qui gère la base de données d'un bibliothèque.
+  contact:
+    name: Christopher Boisvert
+    email: admin@greenwoodmultimedia.com
+    url: https://greenwoodmultimedia.com/prendre-contact-avec-nous/
+servers: 
+  - url: http://localhost/libapi
+paths: 
+  /livres:
+    get:
+      tags:
+        - Livre
+      summary: Affiche la liste de tous les livres.
+      responses:
+        '200':
+          description: Un tableau des livres.
+          content:
+            application/json:
+              schema:
+                $ref:'#/components/schemas/Livres'
+  /livre/{id}:
+    get:
+      tags:
+        - Livre
+      summary: Affiche un livre selon son id.
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: Le id du livre à afficher.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Le livre à afficher
+          content:
+            application/json:
+              schema:
+                $ref:'#/components/schemas/Livre'
+  /ajouter/livre:
+    post:
+      tags:
+        - Livre
+      summary: Créer un livre.
+      requestBody:
+        description: Les informations du livre à créer.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                titre:
+                  type: string
+                isbn:
+                  type:string
+                genre_id:
+                  type:string
+              example:
+                titre: Harry potter
+                isbn: "10001"
+                genre_id: 1
+      responses:
+        '201':
+          description: Le id du livre créé.
+          content:
+            application/json/:
+              schema:
+                type: object
+                properties:
+                  livre_id: 
+                    type: integer
+                example:
+                  livre_id: 1
+components:
+  schemas:
+    Livre:
+      type: object
+      required: 
+        - titre
+        - isbn
+        - genre_id
+      properties:
+        id:
+          type: integer
+          format: int64
+        titre:
+          type: string
+        isbn:
+          type: string
+        genre_id:
+          type: integer
+          format: int64
+      example:
+        id: 1
+        titre: "Harry potter"
+        isbn: "10001"
+        genre_id: 1
+    Livres:
+      type: array
+      items:
+        $ref: '#/components/schemas/Livre'
