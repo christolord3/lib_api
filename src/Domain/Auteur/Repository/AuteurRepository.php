@@ -6,10 +6,10 @@ namespace App\Domain\Auteur\Repository;
 use PDO;
 
 /**
- * Classe ObtenirAuteurRepository
+ * Classe AuteurRepository
  * @package App\Domain\Auteur\Repository
  */
-class ObtenirAuteurRepository
+class AuteurRepository
 {
 
 	function __construct(PDO $connection)

@@ -2,15 +2,15 @@
 
 namespace App\Action;
 
-use App\Domain\User\Service\UserCreator;
+use App\Domain\Utilisateur\Service\UtilisateurService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class UserCreateAction
+final class AjouterUtilisateurAction
 {
     private $userCreator;
 
-    public function __construct(UserCreator $userCreator)
+    public function __construct(UtilisateurService $userCreator)
     {
         $this->userCreator = $userCreator;
     }
@@ -23,7 +23,7 @@ final class UserCreateAction
         $data = (array)$request->getParsedBody();
 
         // Invoke the Domain with inputs and retain the result
-        $userId = $this->userCreator->createUser($data);
+        $userId = $this->userCreator->ajouter_utilisateur($data);
 
         // Transform the result into the JSON representation
         $result = [

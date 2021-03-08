@@ -1,11 +1,14 @@
 <?php
 
+use App\Middleware\AutorisationMiddleware;
 use Selective\BasePath\BasePathMiddleware;
 use Slim\App;
-use Slim\Middleware\ErrorMiddleware;
 use Slim\Views\TwigMiddleware;
 
-return function (App $app) {
+return function (App $app)
+{
+	$app->add(AutorisationMiddleware::class);
+
     // Parse json, form data and xml
     $app->addBodyParsingMiddleware();
 

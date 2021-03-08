@@ -1,5 +1,6 @@
 <?php
 
+use App\Middleware\Autorisation\Repository\AutorisationMiddlewareRepository;
 use Psr\Container\ContainerInterface;
 use Slim\App;
 use Slim\Factory\AppFactory;
@@ -56,7 +57,7 @@ return [
     },
 
 	//TWIG TEMPLATES
-	Twig:: class => function (ContainerInterface $container) {
+	Twig::class => function (ContainerInterface $container) {
 		$settings = $container->get('settings');
 		$twigSettings = $settings['twig'];
 		$options = $twigSettings['options'];
@@ -67,10 +68,10 @@ return [
 		return $twig;
 	},
 
-	TwigMiddleware::class => function(ContainerInterface $container) {
-		return TwigMiddleware::createFromContainer(
-			$container->get(App::class),
-			Twig::class
-		);
-	},
+    TwigMiddleware::class => function (ContainerInterface $container) {
+	    return TwigMiddleware::createFromContainer(
+		    $container->get( App::class ),
+		    Twig::class
+	    );
+    }
 ];

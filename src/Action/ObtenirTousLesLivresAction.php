@@ -3,7 +3,7 @@
 
 namespace App\Action;
 
-use App\Domain\Livre\Service\GestionLivre;
+use App\Domain\Livre\Service\LivreService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -11,7 +11,7 @@ final class ObtenirTousLesLivresAction
 {
 	private $obtenirLivre;
 
-	public function __construct(GestionLivre $obtenirLivre)
+	public function __construct(LivreService $obtenirLivre)
 	{
 		$this->obtenirLivre = $obtenirLivre;
 	}
@@ -21,14 +21,14 @@ final class ObtenirTousLesLivresAction
 		ResponseInterface $response
 	): ResponseInterface {
 
-	// Invoke the Domain with inputs and retain the result
-	$resultat = $this->obtenirLivre->obtenir_tous_les_livres();
+		// Invoke the Domain with inputs and retain the result
+		$resultat = $this->obtenirLivre->obtenir_tous_les_livres();
 
-	// Build the HTTP response
-	$response->getBody()->write((string)json_encode($resultat));
+		// Build the HTTP response
+		$response->getBody()->write((string)json_encode($resultat));
 
-	return $response
-		->withHeader('Content-Type', 'application/json')
-		->withStatus(201);
+		return $response
+			->withHeader('Content-Type', 'application/json')
+			->withStatus(200);
 	}
 }

@@ -9,7 +9,7 @@ use PhpParser\Node\Expr\Cast\Bool_;
 /**
  * Repository.
  */
-class GestionLivreRepository
+class LivreRepository
 {
 	/**
 	 * @var PDO The database connection
@@ -37,33 +37,28 @@ class GestionLivreRepository
 
 	public function obtenir_un_livre_avec_id_bdd($id)
 	{
-		$sql = "SELECT * FROM livres WHERE id=$id";
+		$sql = "SELECT * FROM livres WHERE id=:id";
 
-		$resultat = $this->connection->query($sql);
+		$requete_obtenir_livre = $this->connection->prepare($sql);
 
-		return $resultat->fetchAll();
+		$requete_obtenir_livre->execute(array(
+			"id" => $id
+		));
+
+		return $requete_obtenir_livre->fetch();
 	}
 
-	public function ajouter_un_livre_bdd( $titre, $isbn, $genre_id )
+	public function ajouter_un_livre_bdd( $livre )
 	{
-		$resultat_ = Array(
-			"resultat_ajouter_un_livre" => false,
-		);
+		$requete_ajout_livre = $this->connection->prepare("INSERT INTO livres(titre,isbn,genre_id) VALUES(:titre,:isbn,:genre_id)");
 
-		$sql = "INSERT INTO livres(titre,isbn,genre_id) VALUES('$titre', '$isbn', $genre_id)";
+		$requete_ajout_livre->execute(array(
+			"titre" => $livre["titre"],
+			"isbn" => $livre["isbn"],
+			"genre_id" => $livre["genre_id"]
+		));
 
-		$requete_ajout_livre = $this->connection->query($sql);
-
-		if($requete_ajout_livre->rowCount() > 0)
-		{
-			$resultat["resultat_ajouter_un_livre"] = true;
-			return $resultat;
-		}
-		else
-		{
-			$resultat["resultat_ajouter_un_livre"] = true;
-			return $resultat;
-		}
+		return $requete_ajout_livre;
 	}
 
 	public function verifier_genre_invalide_bdd( $genre_id )

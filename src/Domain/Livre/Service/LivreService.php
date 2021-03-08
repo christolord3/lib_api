@@ -3,19 +3,20 @@
 
 namespace App\Domain\Livre\Service;
 
-use App\Domain\Livre\Repository\GestionLivreRepository;
+use App\Domain\Livre\Repository\LivreRepository;
 use App\Exception\ValidationException;
 use App\Factory\LoggerFactory;
+use mysql_xdevapi\Exception;
 
 /**
- * Class GestionLivre Service.
+ * Class LivreService Service.
  * @package App\Domain\Livre\Service
  */
-class GestionLivre
+class LivreService
 {
 
 	/**
-	 * @var GestionLivreRepository
+	 * @var LivreRepository
 	 */
 	private $gestion_livre_repository;
 	private $logger;
@@ -23,12 +24,12 @@ class GestionLivre
 	/**
 	 * The constructor.
 	 *
-	 * @param GestionLivreRepository $repository The repository
+	 * @param LivreRepository $Repository The Repository
 	 */
-	public function __construct(GestionLivreRepository $gestion_livre_repository, LoggerFactory $logger)
+	public function __construct(LivreRepository $gestion_livre_repository, LoggerFactory $logger)
 	{
 		$this->gestion_livre_repository = $gestion_livre_repository;
-		$this->logger = $logger->addFileHandler("GestionLivre.log")->createLogger();;
+		$this->logger = $logger->addFileHandler("LivreService.log")->createLogger();;
 	}
 
 	function obtenir_tous_les_livres()
@@ -45,7 +46,8 @@ class GestionLivre
 	{
 		$this->verifier_format_livre($livre);
 
-		return $this->gestion_livre_repository->ajouter_un_livre_bdd( $livre["titre"], $livre["isbn"], $livre["genre_id"] );
+		return $this->gestion_livre_repository->ajouter_un_livre_bdd( $livre );
+
 	}
 
 	private function verifier_format_livre( $livre )

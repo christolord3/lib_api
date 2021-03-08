@@ -3,7 +3,7 @@
 
 namespace App\Action;
 
-use App\Domain\Auteur\Service\ObtenirAuteur;
+use App\Domain\Auteur\Service\AuteurService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -12,7 +12,7 @@ final class ObtenirAuteurAction
 {
 	private $obtenirAuteur;
 
-	public function __construct(ObtenirAuteur $obtenirAuteur)
+	public function __construct(AuteurService $obtenirAuteur)
 	{
 		$this->obtenirAuteur = $obtenirAuteur;
 	}

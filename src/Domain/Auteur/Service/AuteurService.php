@@ -3,27 +3,26 @@
 
 namespace App\Domain\Auteur\Service;
 
-use App\Domain\Auteur\Repository\ObtenirAuteurRepository;
-use App\Exception\ValidationException;
+use App\Domain\Auteur\Repository\AuteurRepository;
 
 /**
- * Classe ObtenirAuteur.
+ * Classe AuteurService.
  * @package App\Domain\Auteur\Service
  */
-class ObtenirAuteur
+class AuteurService
 {
 
 	/**
-	 * @var ObtenirAuteurRepository
+	 * @var AuteurRepository
 	 */
 	private $repository;
 
 	/**
 	 * Le constructeur.
 	 *
-	 * @param ObtenirAuteurRepository $repository Le répertoire des données des auteurs.
+	 * @param AuteurRepository $repository Le répertoire des données des auteurs.
 	 */
-	public function __construct(ObtenirAuteurRepository $repository)
+	public function __construct(AuteurRepository $repository)
 	{
 		$this->repository = $repository;
 	}
