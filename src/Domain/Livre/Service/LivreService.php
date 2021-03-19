@@ -4,9 +4,9 @@
 namespace App\Domain\Livre\Service;
 
 use App\Domain\Livre\Repository\LivreRepository;
-use App\Exception\ValidationException;
+use App\Exception\LivreException;
 use App\Factory\LoggerFactory;
-use mysql_xdevapi\Exception;
+use http\Exception;
 
 /**
  * Class LivreService Service.
@@ -18,7 +18,7 @@ class LivreService
 	/**
 	 * @var LivreRepository
 	 */
-	private $gestion_livre_repository;
+	private $livreRepository;
 	private $logger;
 
 	/**
@@ -26,47 +26,72 @@ class LivreService
 	 *
 	 * @param LivreRepository $Repository The Repository
 	 */
-	public function __construct(LivreRepository $gestion_livre_repository, LoggerFactory $logger)
+	public function __construct(LivreRepository $livreRepository, LoggerFactory $logger)
 	{
-		$this->gestion_livre_repository = $gestion_livre_repository;
-		$this->logger = $logger->addFileHandler("LivreService.log")->createLogger();;
+		$this->livreRepository = $livreRepository;
+		$this->logger = $logger->addFileHandler("LivreService.log")->createLogger();
 	}
 
 	function obtenir_tous_les_livres()
 	{
-		return $this->gestion_livre_repository->obtenir_tous_les_livres_bdd();
+		return $this->livreRepository->obtenir_tous_les_livres();
 	}
 
 	function obtenir_un_livre_avec_id($id)
 	{
-		return $this->gestion_livre_repository->obtenir_un_livre_avec_id_bdd($id);
+		try
+		{
+			$resultat = $this->livreRepository->obtenir_un_livre_avec_id($id);
+		}
+		catch(Exception $e)
+		{
+			throw new LivreException($e->getMessage());
+		}
+
+		if(!$resultat)
+		{
+			throw new LivreException("Le livre que vous avez demandé n'a pas été trouvé.");
+		}
+
+		return $resultat;
 	}
 
 	function ajouter_un_livre($livre)
 	{
 		$this->verifier_format_livre($livre);
 
-		return $this->gestion_livre_repository->ajouter_un_livre_bdd( $livre );
+		$resultat = $this->livreRepository->ajouter_un_livre( $livre );
 
+		if(!$resultat)
+		{
+			throw new LivreException("Le livre que vous avez demandé d'ajouter n'a pas été ajouté.");
+		}
+
+		return $resultat;
 	}
 
 	private function verifier_format_livre( $livre )
 	{
 		if(strlen($livre["titre"]) == 0 || strlen($livre["titre"]) >= 255)
 		{
-			throw new ValidationException("Veuillez ajouter le champ 'titre' dans votre requête JSON. Assurez-vous que celui-ci n'est pas vide et qu'il n'est pas plus grand que 255 caractères.");
+			throw new LivreException("Veuillez ajouter le champ 'titre' dans votre requête JSON. Assurez-vous que celui-ci n'est pas vide et qu'il n'est pas plus grand que 255 caractères.");
 		}
 		if(strlen($livre["isbn"]) == 0 || strlen($livre["isbn"]) > 10)
 		{
-			throw new ValidationException("Veuillez ajouter le champ 'isbn' dans votre requête JSON. Assurez-vous que celui-ci n'est pas vide et qu'il n'est pas plus grand que 10 caractères.");
+			throw new LivreException("Veuillez ajouter le champ 'isbn' dans votre requête JSON. Assurez-vous que celui-ci n'est pas vide et qu'il n'est pas plus grand que 10 caractères.");
 		}
 		if($livre["genre_id"] <= 0 || $livre["genre_id"] == "")
 		{
-			throw new ValidationException("Veuillez ajouter le champ 'genre_id' dans votre requête JSON. Assurez-vous que celui-ci est plus grand que zéro.");
+			throw new LivreException("Veuillez ajouter le champ 'genre_id' dans votre requête JSON. Assurez-vous que celui-ci est plus grand que zéro.");
 		}
-		if($this->gestion_livre_repository->verifier_genre_invalide_bdd($livre["genre_id"]) == "FALSE")
+		if($this->livreRepository->verifier_genre_invalide($livre["genre_id"]) == false)
 		{
-			throw new ValidationException("Le champ 'genre_id' contient un genre qui n'existe pas ! Veuillez vous référer à la page '/genres/' de l'API.");
+			throw new LivreException("Le champ 'genre_id' contient un genre qui n'existe pas ! Veuillez vous référer à la page '/genres/' de l'API.");
 		}
+	}
+
+	public function obtenir_livre_par_auteur( $auteur_id ): array
+	{
+		return $this->livreRepository->obtenir_livre_par_auteur( $auteur_id );
 	}
 }

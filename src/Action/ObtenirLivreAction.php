@@ -24,20 +24,12 @@ final class ObtenirLivreAction
 		// Invoke the Domain with inputs and retain the result
 		$resultat = $this->gestionLivre->obtenir_un_livre_avec_id($request->getAttribute("id",1));
 
-		if($resultat)
-		{
-			// Build the HTTP response
-			$response->getBody()->write((string)json_encode($resultat));
+		// Build the HTTP response
+		$response->getBody()->write((string)json_encode($resultat));
 
-			return $response
-				->withHeader('Content-Type', 'application/json')
-				->withStatus(200);
-		}
-		else
-		{
-			return $response
-				->withHeader('Content-Type', 'application/json')
-				->withStatus(404);
-		}
+		//Si tous ces bien passer, on devrait retourner un livre
+		return $response
+			->withHeader('Content-Type', 'application/json')
+			->withStatus(200);
 	}
 }

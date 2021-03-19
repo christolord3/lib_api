@@ -23,16 +23,19 @@ class AutorisationMiddleware
 	{
 		$response = $request_handler->handle($request);
 
-		$credentiels_base_64 = explode(" ", $request->getHeader("Authorization")[0]);
-
-		$tableau_credentiels = explode(" ", base64_decode($credentiels_base_64[1]));
-
-		$statut_authentification = $this->authentificationService->verifier_utilisateur($tableau_credentiels[0], $tableau_credentiels[1]);
-
-		if(!$statut_authentification)
+		if($request->getUri() != "http://localhost/libapi/v2/documentations")
 		{
-			$new_response = new Psr7Response();
-			return $new_response->withStatus(401);
+			$credentiels_base_64 = explode(" ", $request->getHeader("Authorization")[0]);
+
+			$tableau_credentiels = explode(" ", base64_decode($credentiels_base_64[1]));
+
+			$statut_authentification = $this->authentificationService->verifier_utilisateur($tableau_credentiels[0], $tableau_credentiels[1]);
+
+			if(!$statut_authentification)
+			{
+				$new_response = new Psr7Response();
+				return $new_response->withStatus(401);
+			}
 		}
 
 		return $response;
