@@ -22,6 +22,7 @@ class AutorisationMiddleware
 	public function __invoke(Request $request, RequestHandler $request_handler) : Response
 	{
 		$response = $request_handler->handle($request);
+		$response = $response->withHeader("Access-Control-Allow-Origin","*");
 
 		if($request->getUri() != "http://localhost/libapi/v2/documentations")
 		{
