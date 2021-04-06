@@ -35,12 +35,10 @@ class AutorisationMiddleware
 			if(!$statut_authentification)
 			{
 				$response = new Psr7Response();
-				$response = $response->withHeader("Access-Control-Allow-Origin","*");
 				return $response->withStatus(401);
 			}
 			else
 			{
-				$response = $response->withHeader("Access-Control-Allow-Origin","*");
 				return $response;
 			}
 		}
