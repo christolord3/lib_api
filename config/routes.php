@@ -1,46 +1,60 @@
 <?php
 
+use App\Middleware\AutorisationMiddleware;
 use Slim\App;
+use Slim\Routing\RouteCollectorProxy;
 
 return function (App $app)
 {
+	//V2 path
+	$app->group("/v2", function() use ($app)
+	{
+		//ACCUEIL
+		$app->get('/', \App\Action\AccueilAction::class)->setName('Accueil');
 
-	//PAGE DU SITE WEB
+		//DOCUMENTATION
 
-    $app->get('/', \App\Action\AccueilAction::class)->setName('Accueil');
+		$app->get('/documentations', \App\Action\Docs\SwaggerUiAction::class);
 
-    //UTILISATEURS ROUTES
+		//UTILISATEURS ROUTES
 
-    $app->post('/utilisateurs', \App\Action\AjouterUtilisateurAction::class);
+		$app->post('/utilisateurs', \App\Action\AjouterUtilisateurAction::class);
 
-    //LIVRES ROUTES
+		//Livres
 
-	$app->get('/livres', \App\Action\ObtenirTousLesLivresAction::class);
+		$app->group("/livres", function(RouteCollectorProxy $group) {
 
-	$app->get('/livres/{id}', \App\Action\ObtenirLivreAction::class);
+			$group->get( '/', \App\Action\ObtenirTousLesLivresAction::class );
 
-	$app->post('/livres', \App\Action\AjouterLivreAction::class);
+			$group->get( '/{id}', \App\Action\ObtenirLivreAction::class );
 
-	$app->put('/livres/{id}', \App\Action\ModifierLivreAction::class);
+			$group->post( '/', \App\Action\AjouterLivreAction::class );
 
-	$app->delete('/livres/{id}', \App\Action\SupprimerLivreAction::class);
+			$group->put( '/{id}', \App\Action\ModifierLivreAction::class );
 
-	$app->get('/livres/auteur/{auteur_id}', \App\Action\ObtenirLivreParAuteurAction::class);
+			$group->delete( '/{id}', \App\Action\SupprimerLivreAction::class );
 
-	//AUTEURS ROUTES
+			$group->get( '/auteur/{auteur_id}', \App\Action\ObtenirLivreParAuteurAction::class );
 
-	$app->get('/auteurs', \App\Action\ObtenirTousLesAuteursAction::class);
+		})->add(AutorisationMiddleware::class);;
 
-	$app->get('/auteurs/{auteur_id}', \App\Action\ObtenirAuteurAction::class);
+		//AUTEURS
 
-	$app->post('/auteurs', \App\Action\AjouterAuteurAction::class);
+		$app->group("/auteurs", function(RouteCollectorProxy $group)
+		{
 
-	$app->put('/auteurs/{auteur_id}', \App\Action\ModifierAuteurAction::class);
+			$group->get('/', \App\Action\ObtenirTousLesAuteursAction::class);
 
-	$app->delete('/auteurs/{auteur_id}', \App\Action\SupprimerAuteurAction::class);
+			$group->get('/{auteur_id}', \App\Action\ObtenirAuteurAction::class);
 
-	//DOCUMENTATION
+			$group->post('/', \App\Action\AjouterAuteurAction::class);
 
-	$app->get('/documentations', \App\Action\Docs\SwaggerUiAction::class);
+			$group->put('/{auteur_id}', \App\Action\ModifierAuteurAction::class);
+
+			$group->delete('/{auteur_id}', \App\Action\SupprimerAuteurAction::class);
+
+
+		})->add(AutorisationMiddleware::class);
+	});
 };
 

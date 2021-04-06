@@ -5,6 +5,7 @@ namespace App\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response as Psr7Response;
 use App\Domain\Authentification\Service\AuthentificationService;
@@ -23,24 +24,16 @@ class AutorisationMiddleware
 	{
 		$response = $request_handler->handle($request);
 		$response = $response->withHeader("Access-Control-Allow-Origin","*");
+		$credentiels_base_64 = explode(" ", $request->getHeader("Authorization")[0]);
 
-		if($request->getUri() != "http://localhost/libapi/v2/documentations")
+		$tableau_credentiels = explode(" ", base64_decode($credentiels_base_64[1]));
+
+		$statut_authentification = $this->authentificationService->verifier_utilisateur($tableau_credentiels[0], $tableau_credentiels[1]);
+
+		if(!$statut_authentification)
 		{
-			$credentiels_base_64 = explode(" ", $request->getHeader("Authorization")[0]);
-
-			$tableau_credentiels = explode(" ", base64_decode($credentiels_base_64[1]));
-
-			$statut_authentification = $this->authentificationService->verifier_utilisateur($tableau_credentiels[0], $tableau_credentiels[1]);
-
-			if(!$statut_authentification)
-			{
-				$response = new Psr7Response();
-				return $response->withStatus(401);
-			}
-			else
-			{
-				return $response;
-			}
+			$response = new Psr7Response();
+			return $response->withStatus(403);
 		}
 		else
 		{
